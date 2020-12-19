@@ -1,6 +1,6 @@
 import os
 import discord
-import dotenv import load_dotenv
+from dotenv import load_dotenv
 from discord.ext import commands
 
 load_dotenv()
