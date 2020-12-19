@@ -1,5 +1,11 @@
+import os
 import discord
+import dotenv import load_dotenv
 from discord.ext import commands
+
+load_dotenv()
+
+BOT_TOKEN = os.getenv('BOT_TOKEN')
 
 client = commands.Bot(command_prefix = '.peepoo')
 
@@ -15,4 +21,4 @@ async def on_message(message):
     if message.content.startswith('$hello'):
         await message.channel.send('Hello!')
 
-client.run('Nzg5OTQ2MzI0OTE2NTAyNTMw.X95c2A.CX5_wFTk0cje_DaW1Vdn7y6ENZY')
+client.run(BOT_TOKEN)
