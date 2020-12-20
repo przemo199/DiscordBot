@@ -12,7 +12,7 @@ keyshop_xpath = '//*[@id="game-card"]/div[1]/div/div[2]/div[2]/div/div[2]/a/div/
 games_list_xpath = '//*[@id="games-list"]'
 
 
-def main(search_term):
+def searchforgame(search_term):
     request_url = search_url + search_term
 
     response = requests.get(request_url)
@@ -49,17 +49,18 @@ def getdetails(game_url):
     html = etree.parse(io.StringIO(response), htmlparser)
 
     game_title = html.xpath(title_xpath)
-    store_price = html.xpath(store_xpath)
-    keyshop_price = html.xpath(keyshop_xpath)
+    game_title = processdetail(game_title)
 
-    game_title = processlist(game_title)
-    store_price = processlist(store_price)
-    keyshop_price = processlist(keyshop_price)
+    store_price = html.xpath(store_xpath)
+    store_price = processdetail(store_price)
+
+    keyshop_price = html.xpath(keyshop_xpath)
+    keyshop_price = processdetail(keyshop_price)
 
     return game_title, store_price, keyshop_price
 
 
-def processlist(value):
+def processdetail(value):
     if len(value) == 0:
         value = '-'
     else:

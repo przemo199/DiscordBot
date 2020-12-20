@@ -1,10 +1,16 @@
 """This module is used to pull information from www.amazon.uk"""
 
 import io
+import re
 
 import requests
 from lxml import etree
 
+HEADERS = ({'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+            'Accept-Language': 'en-UK, en;q=0.5'})
+
+base_url = 'https://www.amazon.co.uk'
 search_url = 'https://www.amazon.co.uk/s?k='
 
 name_xpath = '//*[@id="productTitle"]/text()'
@@ -16,34 +22,32 @@ reviews_xpath = '//*[@id="acrCustomerReviewText"]/text()'
 delivery_xpath = '//*[@id="price-shipping-message"]/span/b/text()'
 altdelivery_xpath = '//*[@id="price-shipping-message"]/b/text()'
 
+productlink_xpath = '//*[@id="search"]/div[1]/div[2]/div/span[3]/div[2]/div[2]/div/span/div/div/div[2]/div[1]/div/div/span/a'
+xpath1 = '//*[@id="search"]/div[1]/div[2]/div/span[3]/div[2]/div['
+xpath2 = ']/div/span/div/div/div[2]/div[1]/div/div/span/a/@href'
 
-def main(search_term):
+link_regex = ".*\/dp\/.*\/"
+
+
+def searchforproduct(search_term):
     request_url = search_url + search_term
 
-    response = requests.get(request_url)
+    response = requests.get(request_url, headers = HEADERS)
     response = response.text
     htmlparser = etree.HTMLParser()
     html = etree.parse(io.StringIO(response), htmlparser)
 
-    games_parent_path = name_xpath + '/div[1]'
-    games_parent = html.xpath(games_parent_path)
+    a = html.xpath('//*[@data-index]//span[@class="rush-component"]//a[@class="a-link-normal"]/@href')
 
-    games_found = 'emptyProvider' not in games_parent[0].get('class')
+    links = []
+    for link in a:
+        links.append(re.search(link_regex, link).group(0))
 
-    if games_found:
-        games = html.xpath(games_parent_path + '/div[1]')
-        number_of_games_found = len(games[0].getchildren())
+    for i in range(len(links)):
+        links[i] = base_url + links[i]
 
-        number_of_games_to_return = number_of_games_found
-        if number_of_games_to_return > 5:
-            number_of_games_to_return = 5
-
-        return_list = []
-        for x in range(number_of_games_to_return):
-            url = 'https://gg.deals' + games[0][x][0].get('href')
-            return_list.append(getdetails(url))
-        return return_list
-    return False
+    links = list(dict.fromkeys(links))
+    return links
 
 
 def getdetails(product_url):
@@ -54,35 +58,35 @@ def getdetails(product_url):
     html = etree.parse(io.StringIO(response), htmlparser)
 
     product_name = html.xpath(name_xpath)
-    product_name = processlist(product_name)
+    product_name = processdetail(product_name)
 
     product_price = html.xpath(price_xpath)
-    product_price = processlist(product_price)
-
-    if product_price == '-':
-        product_price = html.xpath(altprice_xpath)
-        product_price = processlist(product_price)
+    product_price = processdetail(product_price)
 
     other_price = html.xpath(otherprice_xpath)
-    other_price = processlist(other_price)
+    other_price = processdetail(other_price)
 
     product_rating = html.xpath(rating_xpath)
-    product_rating = processlist(product_rating)
+    product_rating = processdetail(product_rating)
 
     product_reviews = html.xpath(reviews_xpath)
-    product_reviews = processlist(product_reviews)
+    product_reviews = processdetail(product_reviews)
 
     delivery = html.xpath(delivery_xpath)
-    delivery = processlist(delivery)
+    delivery = processdetail(delivery)
 
     if delivery == '-':
         delivery = html.xpath(altdelivery_xpath)
-        delivery = processlist(delivery)
+        delivery = processdetail(delivery)
+
+    if product_price == '-':
+        product_price = html.xpath(altprice_xpath)
+        product_price = processdetail(product_price)
 
     return product_name, product_price, other_price, product_rating, product_reviews, delivery
 
 
-def processlist(value):
+def processdetail(value):
     if len(value) == 0:
         value = '-'
     else:
@@ -90,4 +94,4 @@ def processlist(value):
     return value
 
 
-print(getdetails('https://www.amazon.co.uk/Logitech-LIGHTSPEED-Pro-Grade-Adjustable-Programmable/dp/B07S9DR8QG/'))
+print(searchforproduct('g703'))

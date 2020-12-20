@@ -19,7 +19,7 @@ async def on_ready():
 
 @client.command()
 async def get_price_gg(ctx, *, name_of_game):
-    values = game_scrapper.main(name_of_game)
+    values = game_scrapper.searchforgame(name_of_game)
 
     if not values:
         await ctx.send('No Games Found')
@@ -28,6 +28,7 @@ async def get_price_gg(ctx, *, name_of_game):
         for line in values:
             to_print += f'Full Title: {line[0]}, Store Price: {line[1]}, Key Price: {line[2]}\n'
         await ctx.send(to_print)
+
 
 @client.command()
 async def get_price_newegg(ctx, *, name_of_item):
