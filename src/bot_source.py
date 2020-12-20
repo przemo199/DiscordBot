@@ -22,7 +22,7 @@ async def get_price(ctx, *, nameOfGame):
     else:
         to_print = ''
         for line in values:
-            to_print+=f'Full Title: {line[0]}, Store Price: {line[1]}, Key Price: {line[2]}\n'
+            to_print += f'Full Title: {line[0]}, Store Price: {line[1]}, Key Price: {line[2]}\n'
         await ctx.send(to_print)
 
 client.run(BOT_TOKEN)

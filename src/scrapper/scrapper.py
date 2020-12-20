@@ -46,9 +46,26 @@ def getprices(url):
     htmlparser = etree.HTMLParser()
     html = etree.parse(io.StringIO(response), htmlparser)
 
-    title = html.xpath(title_xpath)
+    game_title = html.xpath(title_xpath)
     store_price = html.xpath(store_xpath)
     keyshop_price = html.xpath(keyshop_xpath)
 
-    return title[0], store_price[0], keyshop_price[0]
+    if len(game_title) == 0:
+        game_title = ''
+    else:
+        game_title = game_title[0]
+
+    if len(store_price) == 0:
+        store_price = ''
+    else:
+        store_price = store_price[0]
+
+    if len(keyshop_price) == 0:
+        keyshop_price = ''
+    else:
+        keyshop_price = keyshop_price[0]
+
+    return game_title, store_price, keyshop_price
+
+print(getprices('https://gg.deals/game/mbeeee/'))
 
