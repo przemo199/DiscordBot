@@ -1,26 +1,31 @@
-"""This module is used to pull information from websites"""
+"""This module is used to pull information from www.amazon.uk"""
 
 import io
 
 import requests
 from lxml import etree
 
-base_url = 'https://gg.deals/games/?title='
-title_xpath = '//*[@id="page"]/div[2]/div/ul/li[4]/a/span/text()'
-store_xpath = '//*[@id="game-card"]/div[1]/div/div[2]/div[2]/div/div[1]/a/div/span/span/text()'
-keyshop_xpath = '//*[@id="game-card"]/div[1]/div/div[2]/div[2]/div/div[2]/a/div/span/span/text()'
-games_list_xpath = '//*[@id="games-list"]'
+search_url = 'https://www.amazon.co.uk/s?k='
+
+name_xpath = '//*[@id="productTitle"]/text()'
+price_xpath = '//*[@id="priceblock_ourprice"]/text()'
+altprice_xpath = '//*[@id="priceblock_saleprice"]/text()'
+otherprice_xpath = '//*[@id="olp-upd-new-used"]/span/a/span[3]/text()'
+rating_xpath = '//*[@id="reviewsMedley"]/div/div[1]/div[2]/div[1]/div/div[2]/div/span/span/text()'
+reviews_xpath = '//*[@id="acrCustomerReviewText"]/text()'
+delivery_xpath = '//*[@id="price-shipping-message"]/span/b/text()'
+altdelivery_xpath = '//*[@id="price-shipping-message"]/b/text()'
 
 
 def main(search_term):
-    search_url = base_url + search_term
+    request_url = search_url + search_term
 
-    response = requests.get(search_url)
+    response = requests.get(request_url)
     response = response.text
     htmlparser = etree.HTMLParser()
     html = etree.parse(io.StringIO(response), htmlparser)
 
-    games_parent_path = games_list_xpath + '/div[1]'
+    games_parent_path = name_xpath + '/div[1]'
     games_parent = html.xpath(games_parent_path)
 
     games_found = 'emptyProvider' not in games_parent[0].get('class')
@@ -36,35 +41,53 @@ def main(search_term):
         return_list = []
         for x in range(number_of_games_to_return):
             url = 'https://gg.deals' + games[0][x][0].get('href')
-            return_list.append(getprices(url))
+            return_list.append(getdetails(url))
         return return_list
     return False
 
 
-def getprices(game_url):
-    response = requests.get(game_url)
+def getdetails(product_url):
+    response = requests.get(product_url)
     response = response.text
 
     htmlparser = etree.HTMLParser()
     html = etree.parse(io.StringIO(response), htmlparser)
 
-    game_title = html.xpath(title_xpath)
-    store_price = html.xpath(store_xpath)
-    keyshop_price = html.xpath(keyshop_xpath)
+    product_name = html.xpath(name_xpath)
+    product_name = processlist(product_name)
 
-    if len(game_title) == 0:
-        game_title = ''
+    product_price = html.xpath(price_xpath)
+    product_price = processlist(product_price)
+
+    if product_price == '-':
+        product_price = html.xpath(altprice_xpath)
+        product_price = processlist(product_price)
+
+    other_price = html.xpath(otherprice_xpath)
+    other_price = processlist(other_price)
+
+    product_rating = html.xpath(rating_xpath)
+    product_rating = processlist(product_rating)
+
+    product_reviews = html.xpath(reviews_xpath)
+    product_reviews = processlist(product_reviews)
+
+    delivery = html.xpath(delivery_xpath)
+    delivery = processlist(delivery)
+
+    if delivery == '-':
+        delivery = html.xpath(altdelivery_xpath)
+        delivery = processlist(delivery)
+
+    return product_name, product_price, other_price, product_rating, product_reviews, delivery
+
+
+def processlist(value):
+    if len(value) == 0:
+        value = '-'
     else:
-        game_title = game_title[0]
+        value = str(value[0]).strip()
+    return value
 
-    if len(store_price) == 0:
-        store_price = ''
-    else:
-        store_price = store_price[0]
 
-    if len(keyshop_price) == 0:
-        keyshop_price = ''
-    else:
-        keyshop_price = keyshop_price[0]
-
-    return game_title, store_price, keyshop_price
+print(getdetails('https://www.amazon.co.uk/Logitech-LIGHTSPEED-Pro-Grade-Adjustable-Programmable/dp/B07S9DR8QG/'))
