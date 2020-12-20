@@ -22,5 +22,3 @@ def getprices(url):
 
     return title[0], store_price[0], keyshop_price[0]
 
-
-print(getprices('https://gg.deals/gb/game/mars-horizon/'))
