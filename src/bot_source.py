@@ -38,7 +38,7 @@ async def get_price_newegg(ctx, *, name_of_item):
     else:
         to_print = ''
         for line in values:
-            to_print += f'Full Title: {line[0]}, Rating: {line[1]}, Number of Reviews: {line[2]}\n'
+            to_print += f'Full Title: {line[0]}, Rating: {line[1]}, Number of Reviews: {line[2]}, Price: {line[3]}\n'
         await ctx.send(to_print)
 
 
