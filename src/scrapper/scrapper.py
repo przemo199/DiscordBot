@@ -10,33 +10,32 @@ keyshop_xpath = '//*[@id="game-card"]/div[1]/div/div[2]/div[2]/div/div[2]/a/div/
 
 gamesList_xpath = '//*[@id="games-list"]'
 
-def main(searchTerm):
-    searchUrl = url1 + searchTerm
+def main(search_term):
+    search_url = url1 + search_term
 
-    response = requests.get(searchUrl)
+    response = requests.get(search_url)
     response = response.text
     htmlparser = etree.HTMLParser()
     html = etree.parse(io.StringIO(response), htmlparser)
 
-    gamesParentPath = gamesList_xpath + '/div[1]'
-    gamesParent = html.xpath(gamesParentPath)
+    games_parent_path = gamesList_xpath + '/div[1]'
+    games_parent = html.xpath(games_parent_path)
 
-    gamesFound = 'emptyProvider' not in gamesParent[0].get('class')
+    games_found = 'emptyProvider' not in games_parent[0].get('class')
     
-    if gamesFound:
-        games = html.xpath(gamesParentPath+'/div[1]')
-        numberOfGamesFound = len(games[0].getchildren())
+    if games_found:
+        games = html.xpath(games_parent_path+'/div[1]')
+        number_of_games_found = len(games[0].getchildren())
 
-        number_of_games_to_return = numberOfGamesFound
+        number_of_games_to_return = number_of_games_found
         if number_of_games_to_return > 5:
             number_of_games_to_return = 5
         
-        returnList = []
+        return_list = []
         for x in range(number_of_games_to_return):
             url = 'https://gg.deals' + games[0][x][0].get('href')
-            values = getprices(url)
-            returnList.append(getprices(url))
-        return returnList
+            return_list.append(getprices(url))
+        return return_list
     return False
     
 def getprices(url):
@@ -51,4 +50,3 @@ def getprices(url):
     keyshop_price = html.xpath(keyshop_xpath)
 
     return title[0], store_price[0], keyshop_price[0]
-

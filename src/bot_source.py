@@ -15,8 +15,8 @@ async def on_ready():
     print('It works')
 
 @client.command()
-async def get_price(ctx, *, nameOfGame):
-    values = scrapper.main(nameOfGame)
+async def get_price(ctx, *, name_of_game):
+    values = scrapper.main(name_of_game)
     if values == False:
         await ctx.send('No Games Found')
     else:
