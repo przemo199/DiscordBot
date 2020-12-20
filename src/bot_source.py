@@ -4,6 +4,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 from scrappers import game_scrapper
+from scrappers import newegg_scrapper
 
 load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
@@ -17,7 +18,7 @@ async def on_ready():
 
 
 @client.command()
-async def get_price(ctx, *, name_of_game):
+async def get_price_gg(ctx, *, name_of_game):
     values = game_scrapper.main(name_of_game)
 
     if not values:
@@ -26,6 +27,18 @@ async def get_price(ctx, *, name_of_game):
         to_print = ''
         for line in values:
             to_print += f'Full Title: {line[0]}, Store Price: {line[1]}, Key Price: {line[2]}\n'
+        await ctx.send(to_print)
+
+@client.command()
+async def get_price_newegg(ctx, *, name_of_item):
+    values = newegg_scrapper.main(name_of_item)
+
+    if not values:
+        await ctx.send('No Items Found')
+    else:
+        to_print = ''
+        for line in values:
+            to_print += f'Full Title: {line[0]}, Rating: {line[1]}, Number of Reviews: {line[2]}\n'
         await ctx.send(to_print)
 
 
