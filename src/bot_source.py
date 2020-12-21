@@ -1,5 +1,6 @@
 import os
 
+import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -17,7 +18,20 @@ separator = '\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n'
 
 @client.event
 async def on_ready():
-    print('It works')
+    print('Locked & loaded')
+
+
+@client.command()
+async def clear(ctx, arg):
+    def is_me(message):
+        return message.author == client.user
+
+    await ctx.channel.purge(limit = arg, argcheck = is_me)
+
+
+@client.command()
+async def clear_all(ctx):
+    await ctx.channel.purge(limit = 100000)
 
 
 @client.command()
@@ -36,8 +50,8 @@ async def get_price_gg(ctx, *, name_of_game):
 
 
 @client.command()
-async def get_price_newegg(ctx, *, name_of_item):
-    values = newegg_scrapper.main(name_of_item)
+async def get_price_newegg(ctx, *, args):
+    values = newegg_scrapper.main(args)
 
     if not values:
         await ctx.send('No Items Found')
@@ -51,20 +65,35 @@ async def get_price_newegg(ctx, *, name_of_item):
 
 
 @client.command()
-async def get_price_amazon(ctx, *, item_name):
-    links = amazon_scrapper.searchforproduct(item_name)
+async def get_price_amazon(ctx, *args):
+    links = amazon_scrapper.searchforproduct('+'.join(args))
 
     if not links:
         await ctx.send('No Items Found')
     else:
-        to_print = separator
-        for link in links[:5]:
+        count = 0
+        skipped = 0
+        for link in links:
             details = amazon_scrapper.getdetails(link)
-            to_print += f'**Full Title:** {details[0]}\n**Price:** {details[1]}\n**Used price:** {details[2]}\n' \
-                        f'**Rating:** {details[3]}\n**Reviews:** {details[4]}\n**Delivery:** {details[5]}\n' \
-                        f'**Link:** <{link}>{separator}'
+            if details[1] == '-' and details[2] == '-':
+                skipped += 1
+                continue
 
-        await ctx.send(to_print)
+            embed = discord.Embed(title = details[0], url = link, color = discord.Color.from_rgb(255, 153, 0))
+            embed.add_field(name = 'Price:', value = details[1])
+            embed.add_field(name = 'Used price:', value = details[2])
+            embed.add_field(name = 'Delivery date:', value = details[3], inline = False)
+            embed.add_field(name = 'Rating:', value = details[4])
+            embed.add_field(name = 'Reviews:', value = details[5])
+            embed.set_image(url = details[6])
+            embed.set_footer(text = link)
+            await ctx.send(embed = embed)
+
+            count += 1
+            if count > 4:
+                break
+        if skipped != 0:
+            await ctx.send(f'```Skipped over {skipped} item(s) without price.```')
 
 
 client.run(BOT_TOKEN)

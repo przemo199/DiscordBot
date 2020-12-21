@@ -1,6 +1,7 @@
 """This module is used to pull information from www.amazon.uk"""
-# TODO: select all elements with data-index convert to string and with shortlink_regex get links to sepcific products
+
 import io
+import json
 import re
 
 import requests
@@ -14,11 +15,17 @@ base_url = 'https://www.amazon.co.uk'
 search_url = 'https://www.amazon.co.uk/s?k='
 
 name_xpath = '//*[@id="productTitle"]/text()'
+
 price_xpath = '//*[@id="priceblock_ourprice"]/text()'
 altprice_xpath = '//*[@id="priceblock_saleprice"]/text()'
+
 otherprice_xpath = '//*[@id="olp-upd-new-used"]/span/a/span[3]/text()'
+
+deliverydate_xpath = '//*[@id="upsell-message"]/b/text()'
+altdeliverydate_xpath = '//*[@id="ddmDeliveryMessage"]/b/text()'
 rating_xpath = '//*[@id="reviewsMedley"]/div/div[1]/div[2]/div[1]/div/div[2]/div/span/span/text()'
 reviews_xpath = '//*[@id="acrCustomerReviewText"]/text()'
+imageurl_xpath = '//img[@id="landingImage"]/@data-a-dynamic-image'
 delivery_xpath = '//*[@id="price-shipping-message"]/span/b/text()'
 altdelivery_xpath = '//*[@id="price-shipping-message"]/b/text()'
 
@@ -66,24 +73,33 @@ def getdetails(product_url):
     other_price = html.xpath(otherprice_xpath)
     other_price = processdetail(other_price)
 
+    delivery_date = html.xpath(deliverydate_xpath)
+    delivery_date = processdetail(delivery_date)
+
     product_rating = html.xpath(rating_xpath)
     product_rating = processdetail(product_rating)
 
     product_reviews = html.xpath(reviews_xpath)
     product_reviews = processdetail(product_reviews)
 
-    delivery = html.xpath(delivery_xpath)
-    delivery = processdetail(delivery)
-
-    if delivery == '-':
-        delivery = html.xpath(altdelivery_xpath)
-        delivery = processdetail(delivery)
+    image_dict = json.loads(html.xpath(imageurl_xpath)[0])
+    image_url = ''
+    maximum = 0
+    for key in image_dict:
+        resolution = image_dict[key][0] * image_dict[key][1]
+        if resolution > maximum:
+            image_url = key
+            maximum = resolution
 
     if product_price == '-':
         product_price = html.xpath(altprice_xpath)
         product_price = processdetail(product_price)
 
-    return product_name, product_price, other_price, product_rating, product_reviews, delivery
+    if delivery_date == '-':
+        delivery_date = html.xpath(altdeliverydate_xpath)
+        delivery_date = processdetail(delivery_date)
+
+    return product_name, product_price, other_price, delivery_date, product_rating, product_reviews, image_url
 
 
 def processdetail(value):
@@ -92,6 +108,3 @@ def processdetail(value):
     else:
         value = str(value[0]).strip()
     return value
-
-
-print(searchforproduct('pants'))
