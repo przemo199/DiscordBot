@@ -36,33 +36,18 @@ def searchforproduct(search_term):
     htmlparser = etree.HTMLParser()
     html_tree = etree.parse(io.StringIO(response), htmlparser)
 
-    hrefs = html_tree.xpath('//*[@data-index]//span[@class="rush-component"]//a[@class="a-link-normal"]/@href')
-
-    elems = html_tree.xpath('//*[@data-index]//span[@class="rush-component"]')
-
-    unique = []
-    for i in elems:
-        a = re.findall(shortlink_regex, str(etree.tostring(i)))
-        print(a)
-        # if a.group(0) and a.group(0) not in unique:
-        # unique.append(a.group(0))
-
-    print(unique)
+    product_trees = html_tree.xpath('//div[@data-component-type="s-search-result"]')
 
     links = []
-    for link in hrefs:
-        links.append(re.search(link_regex, link).group(0))
+    for tree in product_trees:
+        short_link = re.findall(shortlink_regex, str(etree.tostring(tree)))
+        for element in short_link:
+            if element not in links:
+                links.append(element)
 
-    # only take unique elements from links
-    unique_links = []
-    for link in links:
-        if link not in unique_links:
-            unique_links.append(link)
+    links = [base_url + link for link in links]
 
-    for i in range(len(unique_links)):
-        unique_links[i] = base_url + unique_links[i]
-
-    return unique_links
+    return links
 
 
 def getdetails(product_url):
@@ -109,4 +94,4 @@ def processdetail(value):
     return value
 
 
-print(searchforproduct('tv+stick'))
+print(searchforproduct('pants'))

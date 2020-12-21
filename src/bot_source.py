@@ -58,7 +58,7 @@ async def get_price_amazon(ctx, *, item_name):
         await ctx.send('No Items Found')
     else:
         to_print = separator
-        for link in links:
+        for link in links[:5]:
             details = amazon_scrapper.getdetails(link)
             to_print += f'**Full Title:** {details[0]}\n**Price:** {details[1]}\n**Used price:** {details[2]}\n' \
                         f'**Rating:** {details[3]}\n**Reviews:** {details[4]}\n**Delivery:** {details[5]}\n' \
