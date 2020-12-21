@@ -56,11 +56,10 @@ async def get_price_newegg(ctx, *, args):
     if not values:
         await ctx.send('No Items Found')
     else:
-        to_print = '```'
-        to_print += separator
+        to_print = '** **\n'
+        to_print += '▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n'
         for line in values:
-            to_print += f'Full Title: {line[0]}, Rating: {line[1]}, Number of Reviews: {line[2]}, Price: {line[3]}{separator}'
-        to_print += '```'
+            to_print += f'**{line[0]}**\n**Price**: {line[1]}\n**Number of Reviews**: {line[2]}\n**Rating**: {line[3]}\n<{line[4]}>{separator}'
         await ctx.send(to_print)
 
 

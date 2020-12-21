@@ -28,15 +28,22 @@ def main(search_term):
 
         return_list = []
         for x in range(num_items_to_display):
-            name = html.xpath(item_list_xpath + f'/div[{x + 1}]' + name_xpath)  # [0].text
-            rating = html.xpath(item_list_xpath + f'/div[{x + 1}]' + rating_xpath)  # [0].get('title')[-1]
-            rating_num = html.xpath(item_list_xpath + f'/div[{x + 1}]' + rating_num_xpath)  # [0].text[1]
-            price_strong = html.xpath(item_list_xpath + f'/div[{x + 1}]' + price_xpath + '/strong')  # [0].text
-            price_sup = html.xpath(item_list_xpath + f'/div[{x + 1}]' + price_xpath + '/sup')  # [0].text
+            y=x+1
+            name = html.xpath(item_list_xpath + f'/div[{y}]' + name_xpath)#[0].text
+            price_currency = html.xpath(item_list_xpath + f'/div[{y}]' + price_xpath + '/span')#[0].tail
+            price_strong = html.xpath(item_list_xpath + f'/div[{y}]' + price_xpath + '/strong')#[0].text
+            price_sup = html.xpath(item_list_xpath + f'/div[{y}]' + price_xpath + '/sup')#[0].text
+            rating = html.xpath(item_list_xpath + f'/div[{y}]' + rating_xpath)#[0].get('title')[-1]
+            rating_num = html.xpath(item_list_xpath + f'/div[{y}]' + rating_num_xpath)#[0].text[1]
+            href = html.xpath(item_list_xpath + f'/div[{y}]/div/a')#[0].get('href')
 
             item = []
             if name:
                 item.append(name[0].text)
+            else:
+                item.append(None)
+            if price_currency:
+                item.append(price_currency[0].tail + price_strong[0].text + price_sup[0].text)
             else:
                 item.append(None)
             if rating:
@@ -47,8 +54,10 @@ def main(search_term):
                 item.append(rating_num[0].text[1])
             else:
                 item.append(None)
-            if price_strong:
-                item.append(price_strong[0].text + price_sup[0].text)
+            if href:
+                string_to_append = href[0].get('href')
+                x = string_to_append.find("?")
+                item.append(string_to_append[0:x])
             else:
                 item.append(None)
             return_list.append(item)
