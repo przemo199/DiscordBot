@@ -1,5 +1,5 @@
 """This module is used to pull information from www.amazon.uk"""
-
+# TODO: select all elements with data-index convert to string and with shortlink_regex get links to sepcific products
 import io
 import re
 
@@ -23,10 +23,9 @@ delivery_xpath = '//*[@id="price-shipping-message"]/span/b/text()'
 altdelivery_xpath = '//*[@id="price-shipping-message"]/b/text()'
 
 productlink_xpath = '//*[@id="search"]/div[1]/div[2]/div/span[3]/div[2]/div[2]/div/span/div/div/div[2]/div[1]/div/div/span/a'
-xpath1 = '//*[@id="search"]/div[1]/div[2]/div/span[3]/div[2]/div['
-xpath2 = ']/div/span/div/div/div[2]/div[1]/div/div/span/a/@href'
 
-link_regex = ".*\/dp\/.*\/"
+link_regex = r'\/.*\/dp\/.*\/'
+shortlink_regex = r'\/dp\/.{10}'
 
 
 def searchforproduct(search_term):
@@ -35,23 +34,39 @@ def searchforproduct(search_term):
     response = requests.get(request_url, headers = HEADERS)
     response = response.text
     htmlparser = etree.HTMLParser()
-    html = etree.parse(io.StringIO(response), htmlparser)
+    html_tree = etree.parse(io.StringIO(response), htmlparser)
 
-    a = html.xpath('//*[@data-index]//span[@class="rush-component"]//a[@class="a-link-normal"]/@href')
+    hrefs = html_tree.xpath('//*[@data-index]//span[@class="rush-component"]//a[@class="a-link-normal"]/@href')
+
+    elems = html_tree.xpath('//*[@data-index]//span[@class="rush-component"]')
+
+    unique = []
+    for i in elems:
+        a = re.findall(shortlink_regex, str(etree.tostring(i)))
+        print(a)
+        # if a.group(0) and a.group(0) not in unique:
+        # unique.append(a.group(0))
+
+    print(unique)
 
     links = []
-    for link in a:
+    for link in hrefs:
         links.append(re.search(link_regex, link).group(0))
 
-    for i in range(len(links)):
-        links[i] = base_url + links[i]
+    # only take unique elements from links
+    unique_links = []
+    for link in links:
+        if link not in unique_links:
+            unique_links.append(link)
 
-    links = list(dict.fromkeys(links))
-    return links
+    for i in range(len(unique_links)):
+        unique_links[i] = base_url + unique_links[i]
+
+    return unique_links
 
 
 def getdetails(product_url):
-    response = requests.get(product_url)
+    response = requests.get(product_url, headers = HEADERS)
     response = response.text
 
     htmlparser = etree.HTMLParser()
@@ -94,4 +109,4 @@ def processdetail(value):
     return value
 
 
-print(searchforproduct('g703'))
+print(searchforproduct('tv+stick'))

@@ -9,6 +9,9 @@ search_url = 'https://gg.deals/games/?title='
 title_xpath = '//*[@id="page"]/div[2]/div/ul/li[4]/a/span/text()'
 store_xpath = '//*[@id="game-card"]/div[1]/div/div[2]/div[2]/div/div[1]/a/div/span/span/text()'
 keyshop_xpath = '//*[@id="game-card"]/div[1]/div/div[2]/div[2]/div/div[2]/a/div/span/span/text()'
+metascore_xpath = '//*[@id="game-info-side"]/div[3]/div/div/div[1]/a/span/span/text()'
+userscore_xpath = '//*[@id="game-info-side"]/div[3]/div/div[1]/div[2]/a/span/span/text()'
+
 games_list_xpath = '//*[@id="games-list"]'
 
 
@@ -57,7 +60,13 @@ def getdetails(game_url):
     keyshop_price = html.xpath(keyshop_xpath)
     keyshop_price = processdetail(keyshop_price)
 
-    return game_title, store_price, keyshop_price
+    metascore = html.xpath(metascore_xpath)
+    metascore = processdetail(metascore)
+
+    userscore = html.xpath(userscore_xpath)
+    userscore = processdetail(userscore)
+
+    return game_title, store_price, keyshop_price, metascore, userscore, game_url
 
 
 def processdetail(value):
