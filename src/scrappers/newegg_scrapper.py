@@ -1,4 +1,4 @@
-"""This module is used to pull information from websites"""
+"""This module is used to scrap info from www.newegg.com"""
 import io
 
 import requests
@@ -28,14 +28,14 @@ def main(search_term):
 
         return_list = []
         for x in range(num_items_to_display):
-            y=x+1
-            name = html.xpath(item_list_xpath + f'/div[{y}]' + name_xpath)#[0].text
-            price_currency = html.xpath(item_list_xpath + f'/div[{y}]' + price_xpath + '/span')#[0].tail
-            price_strong = html.xpath(item_list_xpath + f'/div[{y}]' + price_xpath + '/strong')#[0].text
-            price_sup = html.xpath(item_list_xpath + f'/div[{y}]' + price_xpath + '/sup')#[0].text
-            rating = html.xpath(item_list_xpath + f'/div[{y}]' + rating_xpath)#[0].get('title')[-1]
-            rating_num = html.xpath(item_list_xpath + f'/div[{y}]' + rating_num_xpath)#[0].text[1]
-            href = html.xpath(item_list_xpath + f'/div[{y}]/div/a')#[0].get('href')
+            y = x + 1
+            name = html.xpath(item_list_xpath + f'/div[{y}]' + name_xpath)  # [0].text
+            price_currency = html.xpath(item_list_xpath + f'/div[{y}]' + price_xpath + '/span')  # [0].tail
+            price_strong = html.xpath(item_list_xpath + f'/div[{y}]' + price_xpath + '/strong')  # [0].text
+            price_sup = html.xpath(item_list_xpath + f'/div[{y}]' + price_xpath + '/sup')  # [0].text
+            rating = html.xpath(item_list_xpath + f'/div[{y}]' + rating_xpath)  # [0].get('title')[-1]
+            rating_num = html.xpath(item_list_xpath + f'/div[{y}]' + rating_num_xpath)  # [0].text[1]
+            href = html.xpath(item_list_xpath + f'/div[{y}]/div/a')  # [0].get('href')
 
             item = []
             if name:

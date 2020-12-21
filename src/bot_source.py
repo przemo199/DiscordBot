@@ -5,6 +5,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 from scrappers import amazon_scrapper
+from scrappers import currency_scrapper
 from scrappers import game_scrapper
 from scrappers import newegg_scrapper
 
@@ -93,6 +94,33 @@ async def get_price_amazon(ctx, *args):
                 break
         if skipped != 0:
             await ctx.send(f'```Skipped over {skipped} item(s) without price.```')
+
+
+@client.command()
+async def get_currency_exchange(ctx, *args):
+    args = list(args)
+
+    if len(args) == 3:
+        request = args[0].upper() + ' ' + args[1].lower() + ' ' + args[2].upper()
+    else:
+        request = args[1].upper() + ' ' + args[2].lower() + ' ' + args[3].upper()
+
+    details = currency_scrapper.getdetails(request)
+    details[1] = details[1].replace('.', '')
+
+    embed = discord.Embed(title = request)
+    if len(args) == 4:
+        embed = discord.Embed(title = request,
+                              description = f'{args[0]} {args[1].upper()} = {round(float(details[0]) * float(args[0]), 3)}'
+                                            f' {args[3].upper()} {details[1]}')
+    else:
+        embed = discord.Embed(title = request,
+                              description = f'1 {args[0].upper} = {details[0]} {args[2].upper} {details[1]}')
+        embed.add_field(name = 'Previous close:', value = details[2])
+        embed.add_field(name = 'Open:', value = details[3])
+        embed.add_field(name = '52-week range:', value = details[4])
+
+    await ctx.send(embed = embed)
 
 
 client.run(BOT_TOKEN)
