@@ -111,7 +111,7 @@ async def get_currency_exchange(ctx, *args):
     embed = discord.Embed(title = request)
     if len(args) == 4:
         embed = discord.Embed(title = request,
-                              description = f'{args[0]} {args[1].upper()} = {round(float(details[0]) * float(args[0]), 3)}'
+                              description = f'{args[0]} {args[1].upper()} = {round(float(details[0]) * float(args[0]), 2)}'
                                             f' {args[3].upper()} {details[1]}')
     else:
         embed = discord.Embed(title = request,
