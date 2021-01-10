@@ -1,3 +1,5 @@
+"""Main file for discord bot"""
+
 import os
 
 import discord

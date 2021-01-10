@@ -7,9 +7,9 @@ import re
 import requests
 from lxml import etree
 
-HEADERS = ({'User-Agent':
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
-            'Accept-Language': 'en-UK, en;q=0.5'})
+USER_AGENT = ({'User-Agent':
+                   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+               'Accept-Language': 'en-UK, en;q=0.5'})
 
 base_url = 'https://www.amazon.co.uk'
 search_url = 'https://www.amazon.co.uk/s?k='
@@ -38,7 +38,7 @@ shortlink_regex = r'\/dp\/.{10}'
 def searchforproduct(search_term):
     request_url = search_url + search_term
 
-    response = requests.get(request_url, headers = HEADERS)
+    response = requests.get(request_url, headers=USER_AGENT)
     response = response.text
     htmlparser = etree.HTMLParser()
     html_tree = etree.parse(io.StringIO(response), htmlparser)
@@ -58,7 +58,7 @@ def searchforproduct(search_term):
 
 
 def getdetails(product_url):
-    response = requests.get(product_url, headers = HEADERS)
+    response = requests.get(product_url, headers=USER_AGENT)
     response = response.text
 
     htmlparser = etree.HTMLParser()

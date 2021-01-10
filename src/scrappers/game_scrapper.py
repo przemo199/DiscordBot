@@ -5,31 +5,30 @@ import io
 import requests
 from lxml import etree
 
-search_url = 'https://gg.deals/games/?title='
-title_xpath = '//*[@id="page"]/div[2]/div/ul/li[4]/a/span/text()'
-store_xpath = '//*[@id="game-card"]/div[1]/div/div[2]/div[2]/div/div[1]/a/div/span/span/text()'
-keyshop_xpath = '//*[@id="game-card"]/div[1]/div/div[2]/div[2]/div/div[2]/a/div/span/span/text()'
-metascore_xpath = '//*[@id="game-info-side"]/div[3]/div/div/div[1]/a/span/span/text()'
-userscore_xpath = '//*[@id="game-info-side"]/div[3]/div/div[1]/div[2]/a/span/span/text()'
+SEARCH_URL = 'https://gg.deals/games/?title='
+TITLE_XPATH = '//*[@id="page"]/div[2]/div/ul/li[4]/a/span/text()'
+STORE_PRICE_XPATH = '//*[@id="game-card"]/div[1]/div/div[2]/div[2]/div/div[1]/a/div/span/span/text()'
+KEYSHOP_PRICE_XPATH = '//*[@id="game-card"]/div[1]/div/div[2]/div[2]/div/div[2]/a/div/span/span/text()'
+METASCORE_XPATH = '//*[@id="game-info-side"]/div[3]/div/div/div[1]/a/span/span/text()'
+USERSCORE_XPATH = '//*[@id="game-info-side"]/div[3]/div/div[1]/div[2]/a/span/span/text()'
 
-games_list_xpath = '//*[@id="games-list"]'
+LIST_OF_GAMES_XPATH = '//*[@id="games-list"]/div[1]'
 
 
 def searchforgame(search_term):
-    request_url = search_url + search_term
+    request_url = SEARCH_URL + search_term
 
     response = requests.get(request_url)
     response = response.text
     htmlparser = etree.HTMLParser()
     html = etree.parse(io.StringIO(response), htmlparser)
 
-    games_parent_path = games_list_xpath + '/div[1]'
-    games_parent = html.xpath(games_parent_path)
+    games_parent = html.xpath(LIST_OF_GAMES_XPATH)
 
     games_found = 'emptyProvider' not in games_parent[0].get('class')
 
     if games_found:
-        games = html.xpath(games_parent_path + '/div[1]')
+        games = html.xpath(LIST_OF_GAMES_XPATH)
         number_of_games_found = len(games[0].getchildren())
 
         number_of_games_to_return = number_of_games_found
@@ -51,19 +50,19 @@ def getdetails(game_url):
     htmlparser = etree.HTMLParser()
     html = etree.parse(io.StringIO(response), htmlparser)
 
-    game_title = html.xpath(title_xpath)
+    game_title = html.xpath(TITLE_XPATH)
     game_title = processdetail(game_title)
 
-    store_price = html.xpath(store_xpath)
+    store_price = html.xpath(STORE_PRICE_XPATH)
     store_price = processdetail(store_price)
 
-    keyshop_price = html.xpath(keyshop_xpath)
+    keyshop_price = html.xpath(KEYSHOP_PRICE_XPATH)
     keyshop_price = processdetail(keyshop_price)
 
-    metascore = html.xpath(metascore_xpath)
+    metascore = html.xpath(METASCORE_XPATH)
     metascore = processdetail(metascore)
 
-    userscore = html.xpath(userscore_xpath)
+    userscore = html.xpath(USERSCORE_XPATH)
     userscore = processdetail(userscore)
 
     return game_title, store_price, keyshop_price, metascore, userscore, game_url
