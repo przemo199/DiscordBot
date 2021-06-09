@@ -5,5 +5,6 @@
 ![Lines of code](https://img.shields.io/tokei/lines/github/przemo199/DiscordBot)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/przemo199/DiscordBot)
 [![CodeFactor](https://www.codefactor.io/repository/github/przemo199/DiscordBot/badge)](https://www.codefactor.io/repository/github/przemo199/DiscordBot)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/przemo199/DiscordBot/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/przemo199/DiscordBot/?branch=main)
 
 DiscordBot is a discord bot build for delivering web scrapping results.

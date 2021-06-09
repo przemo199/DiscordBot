@@ -6,7 +6,7 @@ import random
 import requests
 from lxml import etree
 
-WEBSITE_URL = 'https://developers.whatismybrowser.com/useragents/explore/software_type_specific/web-browser/'
+WEBSITE_URL = 'https://developers.whatismybrowser.com/useragents/explore/hardware_type_specific/computer/'
 
 USER_AGENT_XPATH = '//td/a/text()'
 
