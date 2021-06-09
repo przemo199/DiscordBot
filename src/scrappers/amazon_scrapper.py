@@ -7,9 +7,19 @@ import re
 import requests
 from lxml import etree
 
-USER_AGENT = ({'User-Agent':
-                   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
-               'Accept-Language': 'en-UK, en;q=0.5'})
+HEADERS = {
+    'authority': 'www.amazon.com',
+    'pragma': 'no-cache',
+    'cache-control': 'no-cache',
+    'dnt': '1',
+    'upgrade-insecure-requests': '1',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36',
+    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+    'sec-fetch-site': 'none',
+    'sec-fetch-mode': 'navigate',
+    'sec-fetch-dest': 'document',
+    'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
+}
 
 base_url = 'https://www.amazon.co.uk'
 search_url = 'https://www.amazon.co.uk/s?k='
@@ -38,7 +48,7 @@ shortlink_regex = r'\/dp\/.{10}'
 def searchforproduct(search_term):
     request_url = search_url + search_term
 
-    response = requests.get(request_url, headers=USER_AGENT)
+    response = requests.get(request_url, headers=HEADERS)
     response = response.text
     htmlparser = etree.HTMLParser()
     html_tree = etree.parse(io.StringIO(response), htmlparser)
@@ -58,8 +68,7 @@ def searchforproduct(search_term):
 
 
 def getdetails(product_url):
-    response = requests.get(product_url, headers=USER_AGENT)
-    response = response.text
+    response = requests.get(product_url, headers=USER_AGENT).text
 
     htmlparser = etree.HTMLParser()
     html = etree.parse(io.StringIO(response), htmlparser)
